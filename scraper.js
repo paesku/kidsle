@@ -8,23 +8,22 @@ function initDatabase(callback) {
     // Set up sqlite database.
     var db = new sqlite3.Database('data.sqlite');
     db.serialize(function() {
-            db.run('CREATE TABLE IF NOT EXISTS data (name TEXT)');
-            db.run("CREATE TABLE IF NOT EXISTS data (address TEXT)");
+            db.run('CREATE TABLE IF NOT EXISTS data (title TEXT, address TEXT)');
         callback(db);
     });
 }
 
-function updateRow(db, value) {
+function updateRow(db, title, address) {
     // Insert some data.
-    var statement = db.prepare('INSERT INTO data VALUES (?)');
-    statement.run(value);
+    var statement = db.prepare('INSERT INTO data VALUES (?, ?)');
+    statement.run(title, address);
     statement.finalize();
 }
 
 function readRows(db) {
     // Read some data.
-    db.each('SELECT rowid AS id, name FROM data', function(err, row) {
-        console.log(row.id + ': ' + row.name);
+    db.each('SELECT rowid AS id, title, address FROM data', function(err, row) {
+        console.log(row.id + ': ' + row.title + ', ' + row.address);
     });
 }
 
@@ -47,14 +46,14 @@ function run(db) {
 
     // Set our Urls
     var baseUrl = 'http://www.leipzig.de',
-        path = '/jugend-familie-und-soziales/schulen-und-bildung',
+        rootpath = '/jugend-familie-und-soziales/schulen-und-bildung',
         schools = {
             path: '/schulen',
             basic: '/grundschulen',
             grammas: '/oberschulen'
         };
     // we can loop it later on
-    var page = baseUrl + path + schools.path + schools.basic;
+    var page = baseUrl + rootpath + schools.path + schools.basic;
 
 
     // Use request to read in pages.
@@ -63,13 +62,11 @@ function run(db) {
         // Use cheerio to find things in the page with css selectors.
 
         var $ = cheerio.load(body);
-        var elements = $('div.address-list-item a.link_intern.name').each(function() {
-            var title = $(this).text().trim();
-            updateRow(db, title);
-        });
-        var elements = $('ul.list.left li').each(function() {
-            var address = $(this).text().trim();
-            updateRow(db, address);
+
+        var element = $('div.address-list-item').each(function() {
+            var title = $(this).find('a.link_intern.name').text().trim();
+            var address = $(this).find('ul.list.left li').text().trim();
+            updateRow(db, title, address);
         });
 
         readRows(db);
