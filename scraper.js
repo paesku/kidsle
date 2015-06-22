@@ -54,9 +54,10 @@ function run(db) {
 
 		var elements = $('a[class=link_intern]').each(function () {
 			var value = $(this).text().trim();
-			console.log(value);
 			updateRow(db, value);
 		});
+		
+		console.log(elements);
 
 		readRows(db);
 
