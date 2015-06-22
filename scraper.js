@@ -46,6 +46,7 @@ function run(db) {
 	}
 	// we can loop it later on
 	var page = baseUrl + schools.basic;
+	console.log(page);
 	// Use request to read in pages.
 	fetchPage(page, function (body) {
 		// Use cheerio to find things in the page with css selectors.
