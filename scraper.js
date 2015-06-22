@@ -40,7 +40,7 @@ function fetchPage(url, callback) {
 }
 
 function run(db) {
-	var baseUrl 'http://www.leipzig.de';
+	var baseUrl = 'http://www.leipzig.de';
 	var schools = {
 		basic: '/jugend-familie-und-soziales/schulen-und-bildung/schulen/grundschulen/'
 	}
