@@ -54,6 +54,7 @@ function run(db) {
 
 		var elements = $("a.link_intern.name").each(function () {
 			var value = $(this).text().trim();
+			console.log(value);
 			updateRow(db, value);
 		});
 
