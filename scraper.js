@@ -8,7 +8,8 @@ function initDatabase(callback) {
     // Set up sqlite database.
     var db = new sqlite3.Database('data.sqlite');
     db.serialize(function() {
-        db.run('CREATE TABLE IF NOT EXISTS data (name TEXT)');
+            db.run('CREATE TABLE IF NOT EXISTS data (name TEXT)');
+            db.run("CREATE TABLE IF NOT EXISTS data (address TEXT)");
         callback(db);
     });
 }
@@ -62,10 +63,15 @@ function run(db) {
         // Use cheerio to find things in the page with css selectors.
 
         var $ = cheerio.load(body);
-        var elements = $('div.address-list-item a.link_intern').each(function() {
-            var value = $(this).text().trim();
-            updateRow(db, value);
+        var elements = $('div.address-list-item a.link_intern.name').each(function() {
+            var title = $(this).text().trim();
+            updateRow(db, title);
         });
+        var elements = $('ul.list.left li').each(function() {
+            var address = $(this).text().trim();
+            updateRow(db, address);
+        });
+
         readRows(db);
 
         db.close();
