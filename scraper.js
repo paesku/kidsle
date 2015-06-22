@@ -60,7 +60,7 @@ function run(db) {
             updateRow(db, value);
         });
 
-        console.log(elements);
+        console.log('elments:' elements);
 
         readRows(db);
 
