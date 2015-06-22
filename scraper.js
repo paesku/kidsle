@@ -6,6 +6,9 @@ var sqlite3 = require('sqlite3').verbose();
 
 function initDatabase(callback) {
     // Set up sqlite database.
+    if (db){
+      db.close();
+    }
     var db = new sqlite3.Database('data.sqlite');
     db.serialize(function() {
             db.run('CREATE TABLE IF NOT EXISTS data (title TEXT, address TEXT)');
