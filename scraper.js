@@ -52,7 +52,7 @@ function run(db) {
 		// Use cheerio to find things in the page with css selectors.
 		var $ = cheerio.load(body);
 
-		var elements = $("a.link_intern name").each(function () {
+		var elements = $("a.link_intern.name").each(function () {
 			var value = $(this).text().trim();
 			updateRow(db, value);
 		});
