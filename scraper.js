@@ -40,14 +40,19 @@ function fetchPage(url, callback) {
 }
 
 function run(db) {
-	var page = 'http://www.leipzig.de/jugend-familie-und-soziales/schulen-und-bildung/schulen/grundschulen/';
+	var baseUrl 'http://www.leipzig.de';
+	var schools = {
+		basic: '/jugend-familie-und-soziales/schulen-und-bildung/schulen/grundschulen/'
+	}
+	// we can loop it later on
+	var page = baseUrl + schools.basic;
 	// Use request to read in pages.
 	fetchPage(page, function (body) {
 		// Use cheerio to find things in the page with css selectors.
 		var $ = cheerio.load(body);
 
-		var elements = $("div.address-list-item").each(function () {
-			var value = $(this).find('.link_intern').text().trim();
+		var elements = $("a.link_intern name").each(function () {
+			var value = $(this).text().trim();
 			updateRow(db, value);
 		});
 
