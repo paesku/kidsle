@@ -47,7 +47,7 @@ function run(db) {
 		var $ = cheerio.load(body);
 
 		var elements = $("div.address-list-item").each(function () {
-			var value = $(this).text().trim();
+			var value = $(this).find('.link_intern').text().trim();
 			updateRow(db, value);
 		});
 
