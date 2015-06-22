@@ -29,7 +29,10 @@ function readRows(db) {
 
 function fetchPage(url, callback) {
     // Use request to read in pages.
-    request(url, function(error, response, body) {
+    request({
+        url: url,
+        gzip: true
+    }, function(error, response, body) {
         if (error) {
             console.log('Error requesting page: ' + error);
             return;
@@ -40,31 +43,33 @@ function fetchPage(url, callback) {
 }
 
 function run(db) {
+
+    // Set our Urls
     var baseUrl = 'http://www.leipzig.de',
         path = '/jugend-familie-und-soziales/schulen-und-bildung',
         schools = {
             path: '/schulen',
-            basic: '/grundschulen/',
-            grammas: '/oberschulen/'
+            basic: '/grundschulen',
+            grammas: '/oberschulen'
         };
     // we can loop it later on
     var page = baseUrl + path + schools.path + schools.basic;
-    console.log(page);
+
+
     // Use request to read in pages.
+    // Use cheerio to find things in the page with css selectors.
     fetchPage(page, function(body) {
         // Use cheerio to find things in the page with css selectors.
-        var $ = cheerio.load('div.search-result-list');
 
-        var elements = $('a[class=link_intern]').each(function() {
+        var $ = cheerio.load(body);
+        var elements = $('div.address-list-item a.link_intern').each(function() {
             var value = $(this).text().trim();
             updateRow(db, value);
         });
-
-        console.log('elments:', elements);
-
         readRows(db);
 
         db.close();
+
     });
 }
 
