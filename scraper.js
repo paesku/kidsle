@@ -40,12 +40,13 @@ function fetchPage(url, callback) {
 }
 
 function run(db) {
+	var page = 'http://www.leipzig.de/jugend-familie-und-soziales/schulen-und-bildung/schulen/grundschulen/';
 	// Use request to read in pages.
-	fetchPage("https://morph.io", function (body) {
+	fetchPage(page, function (body) {
 		// Use cheerio to find things in the page with css selectors.
 		var $ = cheerio.load(body);
 
-		var elements = $("div.media-body span.p-name").each(function () {
+		var elements = $("div.address-list-item").each(function () {
 			var value = $(this).text().trim();
 			updateRow(db, value);
 		});
