@@ -6,19 +6,16 @@ var sqlite3 = require('sqlite3').verbose();
 
 function initDatabase(callback) {
     // Set up sqlite database.
-    if (db){
-      db.close();
-    }
     var db = new sqlite3.Database('data.sqlite');
     db.serialize(function() {
-            db.run('CREATE TABLE IF NOT EXISTS data (title TEXT, address TEXT)');
+        db.run('CREATE TABLE IF NOT EXISTS data (title TEXT, address TEXT, url TEXT, region TEXT, offer TEXT)');
         callback(db);
     });
 }
 
-function updateRow(db, title, address) {
+function updateRow(db, title, address, url, region, offer) {
     // Insert some data.
-    var statement = db.prepare('INSERT INTO data VALUES (?, ?)');
+    var statement = db.prepare('INSERT INTO data VALUES (?, ?, ?, ?, ?)');
     statement.run(title, address);
     statement.finalize();
 }
@@ -66,15 +63,38 @@ function run(db) {
 
         var $ = cheerio.load(body);
 
-        var element = $('div.address-list-item').each(function() {
-            var title = $(this).find('a.link_intern.name').text().trim();
-            var address = $(this).find('ul.list.left li').text().trim();
-            updateRow(db, title, address);
+        var mainPage = $('div.address-list-item').each(function() {
+
+            // Grab and build Detailpages
+            var uniqURL = $(this).find('a.link_intern').attr('href');
+            var completeURL = baseUrl + '/' + uniqURL;
+
+            // Grab Detailpages
+            fetchPage(completeURL, function(body) {
+
+                var $ = cheerio.load(body);
+
+                var detailPage = $('div.content_sidebar').each(function() {
+
+                    // Grab Data
+                    var title = $(this).find('h1').text().trim();
+                    var address = $(this).find('li.address').text().trim();
+                    var schoolURL = $(this).find('ul.list.space.clearfix').eq(1).text().trim();
+                    var region = $(this).find('ul.list.space.clearfix').eq(2).text().trim();
+                    var offer = $(this).find('ul.list.space.clearfix').eq(3).text().trim();
+                    //console.log(title, address, schoolURL, region, offer);
+                    updateRow(db, title, address, schoolURL, region, offer);
+                    readRows(db);
+
+                    //db.close();
+
+                });
+
+            });
+
         });
 
-        readRows(db);
 
-        db.close();
 
     });
 }
