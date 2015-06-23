@@ -22,8 +22,8 @@ function updateRow(db, title, address, url, region, offer) {
 
 function readRows(db) {
     // Read some data.
-    db.each('SELECT rowid AS id, title, address FROM data', function(err, row) {
-        console.log(row.id + ': ' + row.title + ', ' + row.address);
+    db.each('SELECT rowid AS id, title, address, url, region, offer FROM data', function(err, row) {
+        console.log(row.id + ': ' + row.title + ', ' + row.address + ', ' + row.url + ', ' + row.region + ', ' + row.offer);
     });
 }
 
@@ -84,11 +84,13 @@ function run(db) {
                     var offer = $(this).find('ul.list.space.clearfix').eq(3).text().trim();
                     //console.log(title, address, schoolURL, region, offer);
                     updateRow(db, title, address, schoolURL, region, offer);
-                    readRows(db);
 
-                    //db.close();
+
 
                 });
+                //readRows(db);
+
+                //db.close();
 
             });
 
