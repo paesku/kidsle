@@ -78,7 +78,9 @@ function run(db) {
             // var pager = $('div.paging.clearfix').each(function(){
             //     var el = $(this).find('span');
             // });
-            // console.log(completeURL);
+
+
+            // Find the Show all Button
 
 
             // Grab Detailpages
@@ -94,15 +96,15 @@ function run(db) {
                     var schoolURL = $(this).find('ul.list.space.clearfix').eq(1).text().trim();
                     var region = $(this).find('ul.list.space.clearfix').eq(2).text().trim();
                     var offer = $(this).find('ul.list.space.clearfix').eq(3).text().trim();
-                    console.log(title, address, schoolURL, region, offer);
-                    updateRow(db, title, address, schoolURL, region, offer);
+                    //console.log(title, address, schoolURL, region, offer);
+                    updateRow(db, title, null, null, null, null);
 
 
 
                 });
-                readRows(db);
+               // readRows(db);
 
-                //db.close();
+                db.close();
 
             });
 
