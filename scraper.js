@@ -1,12 +1,16 @@
 // This is a template for a Node.js scraper on morph.io (https://morph.io)
+'use strict';
 
 var cheerio = require('cheerio');
 var request = require('request');
 var sqlite3 = require('sqlite3').verbose();
 
-function initDatabase(callback) {
+var db = {
+    schools: 'schools'
+}
+function initDatabase(dbname, callback) {
     // Set up sqlite database.
-    var db = new sqlite3.Database('data.sqlite');
+    var db = new sqlite3.Database(dbname + '.sqlite');
     db.serialize(function() {
         db.run('CREATE TABLE IF NOT EXISTS data (title TEXT, address TEXT, url TEXT, region TEXT, offer TEXT)');
         callback(db);
@@ -52,13 +56,14 @@ function run(db) {
             basic: '/grundschulen',
             grammas: '/oberschulen'
         };
+    var query = '/?tx_ewerkaddressdatabase_pi%5BshowAll%5D=1&tx_ewerkaddressdatabase_pi%5Bquery%5D=&tx_ewerkaddressdatabase_pi%5Baction%5D=teaser&tx_ewerkaddressdatabase_pi%5Bcontroller%5D=Address';
     // we can loop it later on
     var page = baseUrl + rootpath + schools.path + schools.basic;
 
-
+    var test = 'http://www.leipzig.de/jugend-familie-und-soziales/schulen-und-bildung/schulen/grundschulen/?tx_ewerkaddressdatabase_pi%5BshowAll%5D=1&tx_ewerkaddressdatabase_pi%5Bquery%5D=&tx_ewerkaddressdatabase_pi%5Baction%5D=teaser&tx_ewerkaddressdatabase_pi%5Bcontroller%5D=Address';
     // Use request to read in pages.
     // Use cheerio to find things in the page with css selectors.
-    fetchPage(page, function(body) {
+    fetchPage(test, function(body) {
         // Use cheerio to find things in the page with css selectors.
 
         var $ = cheerio.load(body);
@@ -68,6 +73,13 @@ function run(db) {
             // Grab and build Detailpages
             var uniqURL = $(this).find('a.link_intern').attr('href');
             var completeURL = baseUrl + '/' + uniqURL;
+
+            // Grab the pager
+            // var pager = $('div.paging.clearfix').each(function(){
+            //     var el = $(this).find('span');
+            // });
+            // console.log(completeURL);
+
 
             // Grab Detailpages
             fetchPage(completeURL, function(body) {
@@ -82,13 +94,13 @@ function run(db) {
                     var schoolURL = $(this).find('ul.list.space.clearfix').eq(1).text().trim();
                     var region = $(this).find('ul.list.space.clearfix').eq(2).text().trim();
                     var offer = $(this).find('ul.list.space.clearfix').eq(3).text().trim();
-                    //console.log(title, address, schoolURL, region, offer);
+                    console.log(title, address, schoolURL, region, offer);
                     updateRow(db, title, address, schoolURL, region, offer);
 
 
 
                 });
-                //readRows(db);
+                readRows(db);
 
                 //db.close();
 
@@ -101,4 +113,5 @@ function run(db) {
     });
 }
 
-initDatabase(run);
+initDatabase(db.schools, run);
+
